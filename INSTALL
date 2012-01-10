@@ -1,0 +1,8 @@
+
+Software Requeriments:
+
+ + Perl:	v5.10 or higher.
+   - R::YapRI	v0.08 or higher.    
+ + Bioperl: 	v1.6.1 or higher. 	
+ + R:		v2.14.1 or higher.
+   - ade4	v1.4.17 or higher.
