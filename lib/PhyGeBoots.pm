@@ -1166,7 +1166,7 @@ sub run_mltrees {
 	    $runargs{-data_type} = 'nt';
 	}
     }
-    elsif (defined %{$args_href->{dnaml}}) {
+    elsif (defined($args_href->{dnaml})) {
 	%runargs = %{$args_href->{dnaml}};
     }
     else {
