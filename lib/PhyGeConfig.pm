@@ -150,7 +150,7 @@ sub write_conf_file {
 <general>
 \t<input_filenames>
 \t\tsource\t\t\t=\t## Mandatory, example: 'MyAssembly.ace'
-\t\tsource_filetype\t\t=\t## Mandatory, example: 'ace'
+\t\tsource_filetype\t\t=\t## Mandatory, example: 'ace' (ace,blast,tab)
 \t\tmemberseq\t\t=\t## Mandatory, example: 'MyMembers.fasta'
 \t\tmemberstrain\t\t=\t## Mandatory, example: 'MyStrains.tab'
 \t<\/input_filenames>
