@@ -14,6 +14,7 @@
 
  Note: This test use three external files that should be in the same 
        test folder.
+       + testfiles/tabfile.test.txt
        + testfiles/selfblast.test.m8
        + testfiles/seq.test.fasta
        + testfiles/strains.test.tab
@@ -37,7 +38,7 @@ use warnings;
 use autodie;
 
 use Data::Dumper;
-use Test::More tests => 240;
+use Test::More tests => 245;
 use Test::Exception;
 
 use IO::Scalar;
@@ -240,6 +241,7 @@ my $seqfile = "$FindBin::Bin/testfiles/seq.test.fasta";
 my $strainfile = "$FindBin::Bin/testfiles/strains.test.tab";
 my $acefile = "$FindBin::Bin/testfiles/assembly_out.test.ace";
 my $blastdbfile = "$FindBin::Bin/testfiles/blastref.test.fasta";
+my $tabfile = "$FindBin::Bin/testfiles/tabfile.test.txt";
 
 ## First get the data from the files
 
@@ -2464,6 +2466,34 @@ is($outgr_ml <=> 0, 1,
     "Testing run_ml_trees(with outgroup_strain), checking success ($outgr_ml)")
     or diag("Looks like this has failed");
 
+
+## Additional function parse_tabfile
+## TEST 241-245
+
+my $fakehref10 = { blastfile => 'test1', tabfile => 'test2'};
+throws_ok { PhyGeCluster->new($fakehref10) } qr/ARGUMENT INCOMPATIBILITY/, 
+    'TESTING DIE ERROR when tabfile arg. is used with blastfile';
+
+my $fakehref11 = { tabfile => 'test2'};
+throws_ok { PhyGeCluster->new($fakehref11) } qr/ARGUMENT INCOMPATIBILITY/, 
+    'TESTING DIE ERROR when tabfile arg. is used without sequencefile';
+
+my $fakehref12 = { acetfile => 'test1', tabfile => 'test2'};
+throws_ok { PhyGeCluster->new($fakehref12) } qr/ARGUMENT INCOMPATIBILITY/, 
+    'TESTING DIE ERROR when tabfile arg. is used with acefile';
+
+my $cluster_n21 = `cut -f2 $tabfile | sort -u | wc -l`;
+chomp($cluster_n21);
+
+my %clusters21 = PhyGeCluster::parse_tabfile($tabfile);
+is(scalar(keys(%clusters21)), $cluster_n21, 
+    "Testing parse_tabfile, checking number of groups parsed")
+    or diag("Looks like this has failed");
+
+my @clusters21_ids = keys(%clusters21);
+is(ref($clusters21{$clusters21_ids[0]}), 'Bio::Cluster::SequenceFamily',
+    "Testing parse_tabfile, checking retuning 'Bio::Cluster::SequenceFamily'")
+    or diag("Looks like this has failed");
 
 
 ####

@@ -356,7 +356,7 @@ sub _confields {
 	general => {
 	    input_filenames    => { 
 		source              => \%fil_man,
-		source_filetype     => { regexp  => '(ace|blast)', 
+		source_filetype     => { regexp  => '(ace|blast|tab)', 
 					 request => 'mandatory', 
 					 default => undef },
 		memberseq           => \%fil_man,

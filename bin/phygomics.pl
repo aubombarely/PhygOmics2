@@ -276,6 +276,12 @@ if ($sc eq 'blast') {
 	die("ERROR: No cluster_value or fastcluster_values args. were used.\n");
     }
 }
+elsif ($sc eq 'tab') {
+    
+    my $tabfile = $conf{general}->{input_filenames}->{source};
+    my $pathtabfile = File::Spec->catfile($indir, $tabfile);
+    %clusters = PhyGeCluster::parse_tabfile($pathtabfile, $opt_S);
+}
 else {  ## By default it will .ace file
     
     my $acefile = File::Spec->catfile($indir, $conf{general}->{input_filenames}

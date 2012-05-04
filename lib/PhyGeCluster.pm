@@ -68,6 +68,7 @@ $VERSION = eval $VERSION;
   my $phygecluster = PhyGeCluster->new({
                                    acefile       => $filename1a,
                                    blastfile     => $filename1b,
+                                   tabfile       => $filename1c,
                                    blastformat   => $format, 
                                    sequencefile  => $filename2,
                                    strainfile    => $filename3,   
@@ -236,14 +237,30 @@ sub new {
 		croak($err);	    
 	    }
 	}
+	else {
+	    if (defined $args_href->{'tabfile'}) {
+		$err .= "tabfile arg. can not be used with acefile arg.";
+		croak($err);
+	    }
+	}
 	if (defined $args_href->{'sequencefile'}) {
 	    $err .= "sequencefile arg. can not be used without blastfile arg.";
 	    croak($err);	    
+	}
+	if (defined $args_href->{'tabfile'}) {
+	    unless (defined $args_href->{'sequencefile'}) {
+		$err .= "sequencefile arg. is mandatory argument with tabfile.";
+		croak($err);	    
+	    }
 	}
     }
     else {
 	if (defined $args_href->{'acefile'}) {
 	    $err .= "acefile arg. can not be used with blastfile arg.";
+	    croak($err);
+	}
+	if (defined $args_href->{'tabfile'}) {
+	    $err .= "tabfile arg. can not be used with blastfile arg.";
 	    croak($err);
 	}
 	unless (defined $args_href->{'sequencefile'})  {
@@ -971,6 +988,85 @@ sub load_strainfile {
 #######################
 ## PARSING FUNCTIONS ##
 #######################
+
+=head2 parse_tabfile
+
+  Usage: my %clusters = parse_tabfile($tabfile);
+
+  Desc: Parse a simple tabular file (-f1: SeqID, -f2: ClusterName)
+
+  Ret: %cluster, a hash with keys=cluster_name and 
+       value=Bio::Cluster::SequenceFamily object
+
+  Args: $tabfile, a scalar with the filename
+        $repstatus, a scalar (0 or 1)
+
+  Side_Effects: Die if don't exists the file
+
+  Example: my %clusters = parse_tabfile($tabfile);
+
+=cut
+
+sub parse_tabfile {
+    my $tabfile = shift ||
+	croak("ARGUMENT ERROR: No tabfile was supplied to parse_tabfile\n");
+    
+    my $repstatus = shift || 0;
+    if ($repstatus !~ m/^[0-1]$/) {
+	$repstatus = 0;
+    }
+    
+    my %pcluster = ();
+    
+    open my $tabio, '<', $tabfile;
+    my $tt = `cut -f1 $tabfile | wc -l`;
+    chomp($tt);
+    my $tc = 0;
+
+    while(<$tabio>) {
+    	chomp($_);
+	$tc++;
+	my @cols = split('\t', $_);
+	
+	if (exists $pcluster{$cols[1]}) {
+	    push @{$pcluster{$cols[1]}}, $cols[0];
+	}
+	else {
+	    $pcluster{$cols[1]} = [$cols[0]];
+	}
+	if ($repstatus == 1) {
+	    print_parsing_status($tc, $tt, "Percentage of tab file parsed:");
+	}
+    }
+    close $tabio;
+    if ($repstatus == 1) {
+	print "\n";
+    }
+
+    my %clusters = ();
+
+    my $n = 0;
+    foreach my $clid (sort {$pcluster{$a} <=> $pcluster{$b}} keys %pcluster) {
+	$n++;
+
+	my @seqs = ();
+	foreach my $seq_id (@{$pcluster{$clid}}) {
+	    my $seq = Bio::Seq->new(
+		-id => $seq_id,
+		);
+	    push @seqs, $seq;
+	}
+	
+	my $seqfam = Bio::Cluster::SequenceFamily->new(
+	    -family_id => $clid,
+	    -members   => \@seqs,
+	    );
+	$clusters{$clid} = $seqfam;
+    } 
+    return %clusters;
+}
+
+
 
 =head2 parse_blastfile
 
