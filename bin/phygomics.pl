@@ -64,7 +64,10 @@ B<create_steps_files>         Create the files for each step (alignments,
 
    It will run the pipeline in two three steps:
      1) Data loading [1 cycle]
-        1.1) Cluster extraction from one source, assembly file or selfblast.
+        1.1) Cluster extraction from one source: 
+             + assembly file                          (source_filetype = ace)
+             + selfblast                              (source_filetype = blast)
+             + tabular file with members and clusters (source_filetype = tab)
         1.2) Sequence members loading from a fasta file.
         1.3) Strains for members loading from a tabular file.
 
@@ -1530,7 +1533,10 @@ sub help {
       It will run the pipeline in two three steps:
       
       1) Data loading [1 cycle]
-         1.1) Cluster extraction from one source, assembly file or selfblast.
+         1.1) Cluster extraction from one source:
+              + assembly file                          (source_filetype = ace)
+              + selfblast                              (source_filetype = blast)
+              + tabular file with members and clusters (source_filetype = tab)
          1.2) Sequence members loading from a fasta file.
          1.3) Strains for members loading from a tabular file.
 
