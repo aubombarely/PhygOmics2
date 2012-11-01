@@ -1,8 +1,43 @@
 
 Software Requeriments:
 
- + Perl:	v5.10 or higher.
-   - R::YapRI	v0.08 or higher.    
- + Bioperl: 	v1.6.1 or higher. 	
+ + Perl:	     v5.10 or higher.
+   - R::YapRI	     v0.08 or higher.
+   - Try::Tiny       v0.11 or higher.
+   - IO::Scalar      v2.110 or higher.
+   - Config::General v2.51 or highger
+  
+ + Bioperl: 	v1.6.1 or higher.
+   for version 1.6.901 you need to install
+   - Bio::Tools::Run::Phylo::Phylip::Base
+   - Bio::Tools::Run::Phylo::Phylip::Consense
+   - Bio::Tools::Run::Phylo::Phylip::DrawGram
+   - Bio::Tools::Run::Phylo::Phylip::DrawTree
+   - Bio::Tools::Run::Phylo::Phylip::Neighbor
+   - Bio::Tools::Run::Phylo::Phylip::PhylipConf
+   - Bio::Tools::Run::Phylo::Phylip::ProtDist
+   - Bio::Tools::Run::Phylo::Phylip::ProtPars
+   - Bio::Tools::Run::Phylo::Phylip::SeqBoot
+
  + R:		v2.14.1 or higher.
    - ade4	v1.4.17 or higher.
+
+ These programs should be in the executable path:
+ + clustalw 
+   (available as Debian/Ubuntu package)
+ + phylip, executables as dnaml, consense, protdist, seqboot...
+   (available at http://evolution.genetics.washington.edu/phylip/getme.html)
+ + phyml v3.0
+   (available at http://www.atgc-montpellier.fr/phyml/binaries.php)
+   (Don't install the Debian/Ubuntu package)
+ + PAML v4.4 (version 4.6 cause problems with the bioperl module)
+   (available at http://abacus.gene.ucl.ac.uk/software/paml.html#download)
+
+Instructions:
+
+ 1) Install the requeriments.
+
+ 2) Download or copy the Git repo PhygOmics.
+
+ 3) Run the test using 'prove t/*.t'. 
+    More detailed output can be obtained running 'perl t/*.t'
