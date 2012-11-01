@@ -150,7 +150,7 @@ sub write_conf_file {
 <general>
 \t<input_filenames>
 \t\tsource\t\t\t=\t## Mandatory, example: 'MyAssembly.ace'
-\t\tsource_filetype\t\t=\t## Mandatory, example: 'ace' (ace,blast,tab)
+\t\tsource_filetype\t\t=\t## Mandatory, example: 'ace'
 \t\tmemberseq\t\t=\t## Mandatory, example: 'MyMembers.fasta'
 \t\tmemberstrain\t\t=\t## Mandatory, example: 'MyStrains.tab'
 \t<\/input_filenames>
@@ -633,8 +633,9 @@ sub read_conf_file {
 
 		    if (defined $regexp) {
 		    
+			my $val = $conf{$lv1}->{$lv2}->{$lv3};
 			if ($conf{$lv1}->{$lv2}->{$lv3} !~ m/^$regexp$/) {
-			    $err .= "$lv1>$lv2>$lv3";
+			    $err .= "$lv1>$lv2>$lv3 ($val)";
 			    $err .= " doesnt have a permitted value ($regexp)";
 			    croak($err);
 			}
