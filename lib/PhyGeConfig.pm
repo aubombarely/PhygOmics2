@@ -233,7 +233,7 @@ print $cfh qq/
 \t\tscore\t\t\t=\t## Optional, (>) example: '120'
 \t\tlength\t\t\t=\t## Optional, (>) example: '100'
 \t\tnum_residues\t\t=\t## Optional, (>) example: '100'
-\t\tnum_members\t\t=\t## Optional, (<) example: '6'
+\t\tnum_sequences\t\t=\t## Optional, (<) example: '6'
 \t\tpercentage_identity\t=\t## Optional, (>) example: '80'
 \t<\/prune_alignments>
 
@@ -487,7 +487,7 @@ sub _confields {
 					 request => 'optional',
 					 cutoff  => '>',
 					 default => undef },
-		num_members         => { regexp  => '\d+', 
+		num_sequences         => { regexp  => '\d+', 
 					 request => 'optional',
 					 cutoff  => '<',
 					 default => undef },
