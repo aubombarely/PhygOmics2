@@ -1,0 +1,177 @@
+===============================================================================
+INTRODUCTION:
+===============================================================================
+
+PhygOmics is a phylogenetic pipeline designed for the analysis of thousands of 
+genes through gene homology clustering, tree reconstruction for homology 
+groups, tree topology analysis and synonymous-non synonymous ratio analysis.
+
+The analysis unit is the Homology Gene Group (HGG). A HGG is a gene group 
+created by sequence similarity clustering (by a selblast, an assembly file or
+other methods).
+
+Features: 
+ 
+ - Clustering of sequence in Homology Gene Groups (HGGs).
+ - Sequence alignment and filtering per HGG.
+ - Tree calculation (including bootstrapping) and filtering per HGG.
+ - Tree topology clasification based in the strain/accession/species of each
+   member of the HGG.
+ - Kn/Ks calculation for each pair in the phylogenetic tree.
+ - Different paths (runs) comparisons. For example the analysis can be done
+   using a NJ (path 1) and ML trees (path 2) and the results can be compared.
+
+===============================================================================
+INPUTS:
+===============================================================================
+In order to perform this analysis the pipeline needs three different inputs:
+
+ + Information to create the Homology Gene Groups (HGG). This can be 
+   supplied in three different forms:
+
+   * Assembly .ace file if the datasets compared come from closed species or
+     the same species and different accessions (for example: Arabidopsis 
+     thaliana accessions Columbia and Lansberg). In this case the script uses
+     the possibility to create a consensus sequence (contig) to define the
+     HGG.
+
+   * Selfblast in .m8 format. The script will create the HGG based in the
+     blast hits of the sequences with themself, filtering the results based in
+     several blast parameters such as e_value, identity_percentage... . The
+     script can parse the selfblast using two different methods (columnar, 
+     faster and based in Bio::SeqIO from bioperl, slower but with more 
+     parameters to select for the filtering). This input is suggested when 
+     it is not possible the calculation of a consensus sequence between the 
+     members of a HGG, for example in the case that this pipeline want to be
+     applied to gene family analysis.
+
+   * Groups file in tabular format .tab with two columns, sequence ID (1st) and 
+     group (2nd). This input is useful when the genes comes from a resequencing 
+     or RNAseq project with a reference, for example, if 20 different tomato 
+     accessions were sequenced and mapped with the tomato genome. The map
+     can rebuid the gene sequences, so it is possible to keep the mapped
+     gene ID.
+
+ + Sequences of each CDS or mRNA in fasta format
+
+ + Strain/Accession/Species assignment in a tabular file with sequence ID in the
+   first column and the accession/species in the second one.
+
+  These inputs are specified in the configuration file, in the general section:
+
+  	<input_filenames>
+		source			= ## File to create the HGG
+		source_filetype		= ## Type (ace, blast or tab)
+		memberseq		= ## Fasta file
+		memberstrain		= ## File with the accessions/species
+        </input_filenames>
+
+  The configuration file also contains the information to run the pipeline.
+  
+  The configuration file has two parts:
+  1) General section with:
+
+     1.1 - Input files
+
+     1.2 - Cluster parameters with two incompatible sections (cluster_values 
+           and fastcluster_values, you need to delete one of them to use the
+           other one).
+
+  2) Path section:
+    
+     Path section can be specified more than one time using different path names
+     and can  be used to compare differnt methodologies, for example, if you
+     want to compare different alignment software you can create several paths
+     <path 1> could use clustalw, <path 2> mafft and <path 3> tcoffee (remember
+     that you need to have installed these tools to use them).
+
+     Each path section is divided in 4 sections mandatory sections and 9 
+     optional sections. Mandatory sections have to be specified and the pipeline
+     will fail if they are not specified. 
+
+     * Mandatory sections are:
+     ========================= 
+     
+     <path_data>, define the path name
+
+     <alignment>, you need to specify at least the alignment program
+ 
+     <distance>, only optional if you are going to use a tree based method
+
+     <tree>you need to specify at least the tree program
+
+   
+     * Optional sections are:
+     ========================
+
+     <homologous_search>, to search using blast possible homologs, generally 
+                          to use them downstream as outgroups.
+
+     <prune_alignments>, clusters can be composed by different number of members
+                         and perhaps not all the clusters may be interesting. 
+                         Some of them just add noise to the analysis such as 
+                         short sequences or paralogs. Prune alignments is the
+                         first filter that can be used, for example to remove
+                         complex gene families with hundreds of members.
+
+      <prune_overlaps>, it is a more sensitive filter to use after filter the
+                        cluster based in the alignments. It can calculate the
+                        distance between all the sequences and find the minimum
+                        distance for a minimum number of sequences. It can be
+                        used to select specific subclusters in complex clusters,
+                        for example, for three species A, B and C with two genes
+                        each 1 and 2 where distance between species is smaller
+                        than the distance between genes, if composition A=1, B=1
+                        and C=1 is detailed, it will evaluate A1,B1,C1 and A2,
+                        B2 and C2 and probably will select the subcluster with
+                        a minimum distance based in the overlapping score. This
+                        filter can be faster than use the prune_distance filter.
+      
+      <prune_distances>, this optional step let remove some member from the 
+                         alignment based in the matrix of distances.
+
+      <reroot_tree>, different options to reroot the tree based in a reference
+                     midpoint rooting or lengest branch.
+
+      <bootstrapping>, step to perform a boostrapping over the specific trees
+                       and to filter the trees based in the boostrapping values.
+
+      <topoanalysis>, step to compare different tree topologies. Brach_cutoff 
+                      can be used to round values to compare topologies. For 
+                      example 0.01-1 means that branch lengths bellow 0.01 will
+                      be treated as 0 and branches 0.01 to 1 will be treated  
+                      as 1. In other words ((A:0.1,B:1):1,C:0.5) will have the
+                      same topology than ((A:0.8,B:0.9):).5,C:0.3) but different
+                      from  ((A:0.008,B:1):1,C:0.5).
+
+      <allele_identification>, step to perform the allele identification based 
+                               in the tree topology comapring leaves under the
+                               same node.
+
+      <codeml_analysis>, step to analyze the dN/dS ratio (experimental)
+
+      More information about each of the parameters with some examples can be
+      found in the configuratioin file.
+
+      To print the configuration file, use: ./PhygOmics -C
+
+===============================================================================
+RUN THE PIPELINE:
+===============================================================================
+
+  All the arguments need by the pipeline shoudl be specified in the 
+  configuration file. Nevertheless to trace the steps and the status of each
+  run it is convinient to run with -S (to print the status) and -O (to create
+  the intermidiate files).
+
+  PhygOmics -c phygo1.txt -i analysis1 -o results1
+
+
+===============================================================================
+NOTE:
+===============================================================================
+
+  This pipeline is still experimental and it is not bug-free, indeed it works 
+  with a very specific dataset and a a couple of control sets but it has not 
+  been extensively tested, so please write us an email with possible bugs and
+  errors to improve/fix the tool. Thanks in advance
