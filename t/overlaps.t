@@ -21,8 +21,8 @@
 
 =head1 AUTHORS
 
- Aureliano Bombarely Gomez
- (ab782@cornell.edu)
+ Aureliano Bombarely
+ (aurebg@vt.edu)
 
 =cut
 
@@ -78,7 +78,7 @@ foreach my $seqid (sort keys %seqs) {
     $seqloc{$seqid} = $seqloc;
 }
 
-my @metaseqs = values %seqloc;
+my @metaseqs = sort values %seqloc;
 my $align = Bio::SimpleAlign->new(-seqs => \@metaseqs, -id => 'align1');
 
 
@@ -653,7 +653,7 @@ throws_ok { Bio::Align::Overlaps::make_overlap_align($fk4) } qr/ERROR: Member/,
 my %gapschars = ("\." => 25, 
 		 'N'  => 65 );  ## Two gaps chars (one real, one fake)
 
-foreach my $gapchar (keys %gapschars) {
+foreach my $gapchar ("N", "\.") {
     
     foreach my $seqobj ($align->each_seq()) {
 	

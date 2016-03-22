@@ -57,7 +57,7 @@ $VERSION = eval $VERSION;
 
 =head1 AUTHOR
 
-Aureliano Bombarely <ab782@cornell.edu>
+Aureliano Bombarely <aurebg@vt.edu>
 
 
 =head1 CLASS METHODS
@@ -102,6 +102,7 @@ sub get_coordinates {
     ## Split the sequence into nt and scan it
 
     my $seqstr = $seq->seq();
+
     my @nts = split(//, $seqstr);
 
     foreach my $nt (@nts) {
@@ -363,7 +364,7 @@ sub seed_list {
 		
 		    my $req = scalar(keys %filter) || 0;
 		    my $pass = $req;
-		    foreach my $param (keys %filter) {
+		    foreach my $param (sort keys %filter) {
 			if (defined $entry->{$param}) {
 			    if ($entry->{$param} < $filter{$param}) {
 				$pass--;
@@ -619,9 +620,9 @@ sub extension_list {
 
     ## First, it will get the list ids from the matrix
 
-    my @ids = keys %{$ovlseed_href};
+    my @ids = sort keys %{$ovlseed_href};
     
-    foreach my $id (sort @ids) {
+    foreach my $id (@ids) {
 	
 	my $entry = $ovlseed_href->{$id};
 
@@ -629,7 +630,7 @@ sub extension_list {
 
 	    my $req = scalar(keys %filter) || 0;
 	    my $pass = $req; ## Check the filter options
-	    foreach my $param (keys %filter) {
+	    foreach my $param (sort keys %filter) {
 		if (defined $entry->{$param}) {
 		    if ($entry->{$param} < $filter{$param}) {
 			$pass--;
@@ -718,6 +719,9 @@ sub global_overlap {
 	}
     }
 
+    ## Before the coordinates, sort the alignment
+    $align->sort_alphabetically();
+
     ## First get the coordinates for each member.
 
     my $max_en = 0;  ## Get also the max end
@@ -739,7 +743,7 @@ sub global_overlap {
 
     ## Check the selected member that don't exists in the alignment
 
-    foreach my $sel_id ( keys %selected) {
+    foreach my $sel_id (sort keys %selected) {
 	if (ref($selected{$sel_id}) ne 'HASH') {
 	    croak("ERROR: $sel_id doesnt exist into the align=$align\n");
 	}
@@ -759,8 +763,8 @@ sub global_overlap {
 	    $min_en = $selected{$seq_id}->{en};
 	}
     }
-    
-       my $length = $min_en - $max_st + 1;
+
+    my $length = $min_en - $max_st + 1;
 
     my %ovldata = ( start => $max_st, end => $min_en, length => $length ); 
  
