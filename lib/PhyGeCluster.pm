@@ -139,7 +139,7 @@ $VERSION = eval $VERSION;
 
 =head1 AUTHOR
 
-Aureliano Bombarely <ab782@cornell.edu>
+Aureliano Bombarely <aurebg@vt.edu>
 
 
 =head1 CLASS METHODS
@@ -1351,16 +1351,31 @@ sub parse_blastfile {
     my $name_l = length($cluster_n);
 
     my %clmemb = ();
-    foreach my $cl_id (keys %pclusters) {
+    my %checkn = ();
+
+    foreach my $cl_id (sort keys %pclusters) {
 	my $memb_n = scalar(@{$pclusters{$cl_id}});
-	$clmemb{$cl_id} = $memb_n;
+
+	if (exists $checkn{$memb_n}) {
+	
+	    $checkn{$memb_n}++;
+	}
+	else {
+	
+	    $checkn{$memb_n} = 1;
+	}
+
+	$clmemb{$cl_id} = ($memb_n * 1000) + $checkn{$memb_n};
     }
     
+    ## it will rename the CLID based in the number of members
+    ## Nevertheless there are some clusters with the same number
+    ## of members
+
     my $n = 0;
     foreach my $clid (sort { $clmemb{$b} <=> $clmemb{$a} } keys %clmemb) {
 	$n++;
 	my $new_clid = $arg_href->{'rootname'}.'_'.sprintf('%0'.$name_l.'s',$n);
-
 	my @seqs = ();
 	foreach my $seq_id (@{$pclusters{$clid}}) {
 	    my $seq = Bio::Seq->new(
@@ -1511,7 +1526,7 @@ sub fastparse_blastfile {
 
 		my $q_name = $datap{'query_id'};
 		my $s_name = $datap{'subject_id'};
-		
+
 		## define the last cluster n
 		
 		my $cluster_n = scalar(keys(%pclusters));
@@ -1666,11 +1681,25 @@ sub fastparse_blastfile {
     my $name_l = length($cluster_n);
 
     my %clmemb = ();
-    foreach my $cl_id (keys %pclusters) {
+    my %checkn = ();
+
+    foreach my $cl_id (sort keys %pclusters) {
 	my $memb_n = scalar(@{$pclusters{$cl_id}});
-	$clmemb{$cl_id} = $memb_n;
+
+	if (exists $checkn{$memb_n}) {
+	
+	    $checkn{$memb_n}++;
+	}
+	else {
+	
+	    $checkn{$memb_n} = 1;
+	}
+
+	$clmemb{$cl_id} = ($memb_n * 1000) + $checkn{$memb_n};
     }
     
+
+
     my $n = 0;
     foreach my $clid (sort { $clmemb{$b} <=> $clmemb{$a} } keys %clmemb) {
 	$n++;
